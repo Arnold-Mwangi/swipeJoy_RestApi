@@ -1,0 +1,896 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Arnold
+      failOnError: false
+      runAlways: true
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 2
+      author: Arnold
+      failOnError: false
+      runAlways: true
+      changes:
+        - renameColumn:
+            tableName: users
+            oldColumnName: firstName
+            newColumnName: first_name
+            columnDataType: VARCHAR(255)
+
+        - renameColumn:
+            tableName: users
+            oldColumnName: lastName
+            newColumnName: last_name
+            columnDataType: VARCHAR(255)
+
+  - changeSet:
+      id: 3
+      author: Arnold
+      failOnError: false
+      changes:
+        - addUniqueConstraint:
+            constraintName: unique_constraint_name
+            tableName: users
+            columnNames: email
+
+  - changeSet:
+      id: 4
+      author: Arnold
+      failOnError: false
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: role
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 5
+      author: Arnold
+      failOnError: false
+      changes:
+        - createTable:
+            tableName: refresh_token
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: token
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: expiresAt
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: refresh_token
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_refresh_token_user
+
+
+  - changeSet:
+      id: 6
+      author: Arnold
+      failOnError: false
+      changes:
+        - renameColumn:
+            tableName: refresh_token
+            oldColumnName: expiresAt
+            newColumnName: expires_at
+            columnDataType: TIMESTAMP
+
+        - renameColumn:
+            tableName: refresh_token
+            oldColumnName: token
+            newColumnName: refresh_token
+            columnDataType: VARCHAR(255)
+
+  - changeSet:
+      id: 7
+      author: Arnold
+      failOnError: false
+      changes:
+        - createTable:
+            tableName: token_blacklist
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: token
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: token_blacklist
+            columns:
+              - column:
+                  name: token
+            indexName: idx_token_blacklist_token
+
+  - changeSet:
+      id: 8
+      author: Arnold
+      failOnError: false
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: phone_number
+                  type: varchar(20)
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 9
+      author: Arnold
+      failOnError: false
+      runAlways: true
+      changes:
+        - dropColumn:
+            tableName: users
+            columnName: first_name
+
+        - dropColumn:
+            tableName: users
+            columnName: last_name
+
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: phone_verified
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: email_verified
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: phone
+                  type: varchar(20)
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 10
+      author: Arnold
+      failOnError: false
+      changes:
+        - createTable:
+            tableName: permissions
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ermission
+                  type: Varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: role
+                  type: Varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+
+        - createTable:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: Fk_role_permissions_role
+                    references: roles(id)
+              - column:
+                  name: permission_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: Fk_role_permissions_permission
+                    references: Permissions(id)
+
+        - addUniqueConstraint:
+            tableName: role_permissions
+            columnNames: role_id, permission_id
+            constraintName: Uk_role_permissions
+
+  - changeSet:
+      id: 11
+      author: Arnold
+      failOnError: false
+      runAlways: true
+      changes:
+        - renameColumn:
+            tableName: permissions
+            oldColumnName: ermission
+            newColumnName: permission
+            columnDataType: VARCHAR(255)
+
+  - changeSet:
+      id: 12
+      author: Arnold
+      failOnError: false
+      changes:
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: CREATE_PRODUCT
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: SELL_OWN_PRODUCT
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: DELETE_OWN_PRODUCT
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: READ_OWN_PRODUCTS
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: EDIT_OWN_PRODUCT
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: CREATE_ACCOUNTS
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: EDIT_ACCOUNTS
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: DELETE_ACCOUNTS
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: CHANGE_USER_ROLE
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: CHANGE_PERMISSIONS
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: DELETE_PRODUCTS
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: BUY_PRODUCT
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: CANCEL_PURCHASE
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: MAKE_PAYMENT
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: READ_ALL_PRODUCTS
+
+        - insert:
+            tableName: permissions
+            columns:
+              - column:
+                  name: permission
+                  value: DELETE_OWN_ACCOUNT
+
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: role
+                  value: CLIENT
+              - column:
+                  name: role
+                  value: ADMIN
+              - column:
+                  name: role
+                  value: PROVIDER
+
+  - changeSet:
+      id: 13
+      author: Arnold
+      failOnError: false
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: role
+                  value: CLIENT
+              - column:
+                  name: role
+                  value: ADMIN
+
+  - changeSet:
+      id: 14
+      author: Arnold
+      failOnError: false
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: role
+                  value: CLIENT
+
+  - changeSet:
+      id: 15
+      author: Arnold
+      failOnError: false
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: role
+                  value: DUAL
+
+  - changeSet:
+      id: 16
+      author: Arnold
+      failOnError: false
+      changes:
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 1  # PROVIDER ID
+              - column:
+                  name: permission_id
+                  value: 1
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 1  # PROVIDER ID
+              - column:
+                  name: permission_id
+                  value: 2
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 1  # PROVIDER ID
+              - column:
+                  name: permission_id
+                  value: 3
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 1  # PROVIDER ID
+              - column:
+                  name: permission_id
+                  value: 4
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 15
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 6
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 7
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 8
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 11
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 9
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 14
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 10
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 2  # ADMIN ID
+              - column:
+                  name: permission_id
+                  value: 12
+
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 3  # CLIENT ID
+              - column:
+                  name: permission_id
+                  value: 12
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 3  # CLIENT ID
+              - column:
+                  name: permission_id
+                  value: 15
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 3  # CLIENT ID
+              - column:
+                  name: permission_id
+                  value: 14
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 15
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 12
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 14
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 1
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 2
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 16
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 4
+
+#        - insert:
+#            tableName: role_permissions
+#            columns:
+#              - column:
+#                  name: role_id
+#                  value: 4  # DUAL ID
+#              - column:
+#                  name: permission_id
+#                  value: 2
+
+  - changeSet:
+      id: 17
+      author: Arnold
+      failOnError: false
+      changes:
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 1  # PROVIDER ID
+              - column:
+                  name: permission_id
+                  value: 16
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 13
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 5
+
+        - insert:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  value: 4  # DUAL ID
+              - column:
+                  name: permission_id
+                  value: 3
+
+  - changeSet:
+      id: 18
+      author: Arnold
+      failOnError: false
+      changes:
+        - dropColumn:
+            tableName: users
+            columnName: role
+
+
+  - changeSet:
+      id: 19
+      author: Arnold
+      failOnError: false
+      changes:
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    referencedTableName: users
+                    referencedColumnNames: id
+                    foreignKeyName: fk_user_roles_user_id
+              - column:
+                  name: role_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    referencedTableName: roles
+                    referencedColumnNames: id
+                    foreignKeyName: fk_user_roles_role_id
+        - addPrimaryKey:
+            tableName: user_roles
+            columnNames: user_id, role_id
+
+
+
+  - changeSet:
+      id: 20
+      author: Arnold
+      changes:
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: 1
+              - column:
+                  name: role_id
+                  value: 2
+
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: 2
+              - column:
+                  name: role_id
+                  value: 1
+
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: 3
+              - column:
+                  name: role_id
+                  value: 3
+
+  - changeSet:
+      id: 21
+      author: Arnold
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+#
+#        - dropTable:
+#            tableName: user_roles
+
+        - addForeignKeyConstraint:
+            constraintName: fk_users_roles
+            baseTableName: users
+            baseColumnNames: role_id
+            referencedTableName: roles
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 22
+      author: Arnold
+      changes:
+        # Remove NOT NULL constraint from email column
+        - modifyDataType:
+            columnName: email
+            tableName: users
+            newDataType: varchar(255)
+
+        - dropNotNullConstraint:
+            columnName: email
+            tableName: users
+            columnDataType: varchar(255)
+
+  - changeSet:
+      id: 23
+      author: arnold
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: telegram_id
+                  type: BIGINT
+              - column:
+                  name: telegram_username
+                  type: VARCHAR(255)
+  - changeSet:
+      id: 24
+      author: arnold
+      changes:
+        - modifyDataType:
+            tableName: users
+            columnName: telegram_id
+            newDataType: VARCHAR(255)
+        - addUniqueConstraint:
+            tableName: users
+            columnNames: telegram_id
+            constraintName: uq_telegram_id
