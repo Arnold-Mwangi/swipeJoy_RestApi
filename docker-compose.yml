@@ -6,8 +6,8 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: blogs
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: blogspost
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -30,13 +30,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_APPLICATION_NAME=p1
-      - spring.data.redis.host=redis
-      - spring.data.redis.port=6379
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/blogspost
-      - SPRING_DATASOURCE_USERNAME=blogs
-      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_APPLICATION_NAME=${SPRING_APPLICATION_NAME}
+      - spring.data.redis.host=${REDIS_HOST}
+      - spring.data.redis.port=${REDIS_PORT}
+      - SPRING_DATASOURCE_URL=${DATABASE_URL}
+      - SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
       - SPRING_LIQUIBASE_CHANGELOG=classpath:db/changelog/db.changelog-master.yaml
@@ -44,9 +44,9 @@ services:
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
       - LOGGING_LEVEL_ORG_APACHE_COYOTE=DEBUG
       - LOGGING_LEVEL_ORG_APACHE_TOMCAT_UTIL_NET=DEBUG
-      - SECURITY_JWT_EXPIRATION_MINUTES=30
-      - SECURITY_JWT_REFRESH_TOKEN_DURATION_MS=1800000
-      - SECURITY_JWT_SECRET_KEY=MN4DSNQUtkokVfqSsK3ALYCarer6TRrhgsXms9UXoeA=
+      - SECURITY_JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES}
+      - SECURITY_JWT_REFRESH_TOKEN_DURATION_MS=${JWT_REFRESH_TOKEN_DURATION_MS}
+      - SECURITY_JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SPRINGDOC_SWAGGER_UI_PATH=/swagger-ui.html
     depends_on:
       - redis

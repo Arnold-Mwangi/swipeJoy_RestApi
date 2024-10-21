@@ -89,6 +89,10 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.telegram/telegrambots
 	implementation group: 'org.telegram', name: 'telegrambots', version: '6.9.7.1'
 
+	// https://mvnrepository.com/artifact/me.paulschwarz/spring-dotenv
+	implementation group: 'me.paulschwarz', name: 'spring-dotenv', version: '4.0.0'
+
+
 
 
 }
